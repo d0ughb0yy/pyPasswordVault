@@ -20,5 +20,5 @@ Query for account names:\
 `python3 pypass.py -f view -n Google`
 
 ## To-Do
-* Add delete function to delete entries by email
-* Add view by email function
+* Add delete function to delete entries
+* Add master password check
