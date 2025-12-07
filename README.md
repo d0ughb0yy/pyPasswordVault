@@ -11,7 +11,13 @@ encryption and SQLite for local storage.
 * SQLite database for storing account names, usernames and encrypted passwords
 * Create, view, search and delete entries from the command line
 
-## Usage
+## About
+
+You MUST add a .env file to the directory with the MASTER_PASS and SALT entries.\
+Install requirements:\
+`pip install -r requirements.txt`
+
+### Usage
 
 Add an entry to the database:\
 `python3 pypass.py -f add -n Google -u test@gmail.com -p password123`
