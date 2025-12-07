@@ -9,7 +9,7 @@ encryption and SQLite for local storage.
 
 * Encryption of email and password data using pycryptodome library
 * SQLite database for storing account names, usernames and encrypted passwords
-* Create entries and view entries from the command line
+* Create, view, search and delete entries from the command line
 
 ## Usage
 
