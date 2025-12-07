@@ -1,6 +1,6 @@
 import argparse
 
-from db import view_entry, insert_into_db, search_by_email
+from db import view_entry, insert_into_db, search_by_email, delete_entry
 from crypto import UserAccount, encrypt, IV
 
 parser = argparse.ArgumentParser(
@@ -11,10 +11,10 @@ parser = argparse.ArgumentParser(
 parser.add_argument(
     "-f",
     "--function",
-    help="Function to perform add or view",
+    help="Function to perform add, view, search or delete",
     required=True,
     type=str,
-    choices=["add", "view", "search"],
+    choices=["add", "view", "search", "delete"],
 )
 parser.add_argument("-n", "--name", help="Name of the account", type=str)
 parser.add_argument("-u", "--username", help="Username used in the account", type=str)
@@ -41,3 +41,5 @@ if __name__ == "__main__":
         insert_into_db(encrypted_user)
     elif args.function == "search" and acc_name_input:
         search_by_email(acc_username_input, acc_name_input)
+    elif args.function == "delete" and acc_username_input and acc_pass_input:
+        delete_entry(acc_username_input, acc_pass_input, acc_name_input)

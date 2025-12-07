@@ -16,9 +16,14 @@ encryption and SQLite for local storage.
 Add an entry to the database:\
 `python3 pypass.py -f add -n Google -u test@gmail.com -p password123`
 
-Query for account names:\
+Query by account name:\
 `python3 pypass.py -f view -n Google`
 
+Query by email:\
+`python3 pypass.py -f search -u test@gmail.com`
+
+Delete specific entry:\
+`python3 pypass.py -f delete -n Facebook -u test@gmail.com -p password123`
+
 ## To-Do
-* Add delete function to delete entries
 * Add master password check

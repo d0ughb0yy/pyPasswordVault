@@ -99,3 +99,22 @@ def search_by_email(email):
 
         else:
             print(f"No account found for email: {email}")
+
+def delete_entry(email, password, accName):
+    if os.path.exists("accounts.db"):
+        # Connect
+        view_conn = sqlite3.connect("accounts.db")
+        vc = view_conn.cursor()
+
+        # Fetch all encrypted accounts from accounts.db
+        vc.execute("SELECT * FROM accounts")
+        view_conn.commit()
+
+        db_dump = vc.fetchall()
+        for creds in db_dump:
+            encrypted_creds = UserAccount(creds[0], creds[1], creds[2], creds[3])
+            decrypted_creds = decrypt(encrypted_creds)
+
+            if decrypted_creds.email.lower() == email.lower() and decrypted_creds.password.lower() == password.lower() and decrypted_creds.name == accName:
+                vc.execute("DELETE FROM accounts WHERE email=? AND password=?", (encrypted_creds.email, encrypted_creds.password))
+                view_conn.commit()
