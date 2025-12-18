@@ -2,7 +2,7 @@
 
 ## Description
 
-Password manager written in python that encrypts and stores account credentials using AES
+Password manager written in Python that encrypts and stores account credentials using AES
 encryption and SQLite for local storage.
 
 ### Features
@@ -14,7 +14,13 @@ encryption and SQLite for local storage.
 ## About
 
 You MUST add a .env file to the directory with the MASTER_PASS and SALT entries.\
-Install requirements:\
+*Example:*
+```
+MASTER_PASS=4q7$oOJlH80!
+SALT=b'\x19\xb6\x9ec0Xu\x9fghz\x08\xc4\xc4$@]\xd2B\xc9|wk\x1a\xb1\xc9\xbb"1\x1f\x8a\xd3'
+```
+
+**Install requirements**:\
 `pip install -r requirements.txt`
 
 ### Usage
@@ -30,6 +36,3 @@ Query by email:\
 
 Delete specific entry:\
 `python3 pypass.py -f delete -n Facebook -u test@gmail.com -p password123`
-
-## To-Do
-* Add master password check
