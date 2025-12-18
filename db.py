@@ -1,5 +1,6 @@
 import sqlite3
 import os
+import sys
 
 from crypto import decrypt, UserAccount
 
@@ -52,7 +53,7 @@ def view_entry(acc_name_input):
         vc = view_conn.cursor()
 
         # Execute SELECT statement
-        vc.execute("SELECT * FROM accounts WHERE name=?", (acc_name_input,))
+        vc.execute("SELECT * FROM accounts WHERE name=?", (acc_name_input.lower(),))
         view_conn.commit()
 
         # Store everything in a db_dump variable
@@ -76,6 +77,10 @@ def view_entry(acc_name_input):
 
 
 def search_by_email(email):
+    if email == "" or email == None:
+        print("[!] No email/username provided...Exiting [!]")
+        sys.exit(1)
+    
     if os.path.exists("accounts.db"):
         # Connect
         view_conn = sqlite3.connect("accounts.db")
@@ -94,7 +99,6 @@ def search_by_email(email):
                 print(
                     f"Account: {decrypted_creds.name}\nEmail: {decrypted_creds.email}\nPassword: {decrypted_creds.password}"
                 )
-                found = True
                 break
 
         else:

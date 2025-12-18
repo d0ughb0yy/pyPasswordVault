@@ -1,4 +1,6 @@
 import argparse
+import os
+import sys
 
 from db import view_entry, insert_into_db, search_by_email, delete_entry
 from crypto import UserAccount, encrypt, IV
@@ -33,13 +35,42 @@ if __name__ == "__main__":
     # Application logic for --function argument
     if args.function == "view":
         try:
-            user = view_entry(acc_name_input)
+            user_check = input("Please enter master password: ")
+            if user_check != os.getenv("MASTER_PASS"):
+                print("[!] Wrong password try again")
+                sys.exit(1)
+            else:
+                user = view_entry(acc_name_input)
         except Exception as e:
             print(f"{e}")
     elif args.function == "add":
-        encrypted_user = encrypt(user)
-        insert_into_db(encrypted_user)
-    elif args.function == "search" and acc_name_input:
-        search_by_email(acc_username_input, acc_name_input)
+        user_check = input("Please enter master password: ")
+        try:
+            if user_check != os.getenv("MASTER_PASS"):
+                print("[!] Wrong password try again")
+                sys.exit(1)
+            else:
+                encrypted_user = encrypt(user)
+                insert_into_db(encrypted_user)
+        except Exception as e:
+            print(e)
+    elif args.function == "search" and acc_username_input != "" and acc_username_input is not None:
+        user_check = input("Please enter master password: ")
+        try:
+            if user_check != os.getenv("MASTER_PASS"):
+                print("[!] Wrong password try again")
+                sys.exit(1)
+            else:
+                search_by_email(args.username)
+        except Exception as e:
+            print(e)
     elif args.function == "delete" and acc_username_input and acc_pass_input:
-        delete_entry(acc_username_input, acc_pass_input, acc_name_input)
+        user_check = input("Please enter master password: ")
+        try:
+            if user_check != os.getenv("MASTER_PASS"):
+                print("[!] Wrong password try again")
+                sys.exit(1)
+            else:
+                delete_entry(acc_username_input, acc_pass_input, acc_name_input)
+        except Exception as e:
+            print(e)

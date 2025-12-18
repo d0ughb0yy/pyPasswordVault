@@ -38,7 +38,7 @@ def encrypt(user_object):
     # Encrypt the base64 encoded email and password
     user_email_enc = cipher.encrypt(pad(user_email_b64, AES.block_size))
     user_password_enc = cipher.encrypt(pad(user_password_b64, AES.block_size))
-    print(f"Encrypted email: {user_email_enc}, Encrypted Pass: {user_password_enc}")
+    #print(f"Encrypted email: {user_email_enc}, Encrypted Pass: {user_password_enc}")
 
     # Populates a new UserAccount object with encrypted values
     return UserAccount(user_object.name, user_email_enc, user_password_enc, iv=IV)
