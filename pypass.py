@@ -1,76 +1,128 @@
+"""CLI entry point for password manager."""
+
 import argparse
-import os
 import sys
 
-from db import view_entry, insert_into_db, search_by_email, delete_entry
-from crypto import UserAccount, encrypt, IV
-
-parser = argparse.ArgumentParser(
-    prog="pyPass Password Manager",
-    usage="python3 pypass.py [-f (add | view) -n Google -u john@gmail.com -p Password123]",
-    description="Password manager that stores your encrypted data in a sqlite local file",
+from src.utils import require_auth
+from src.crypto import UserAccount, encrypt
+from src.db import (
+    insert_into_db,
+    view_entry,
+    search_by_email,
+    delete_entry
 )
-parser.add_argument(
-    "-f",
-    "--function",
-    help="Function to perform add, view, search or delete",
-    required=True,
-    type=str,
-    choices=["add", "view", "search", "delete"],
-)
-parser.add_argument("-n", "--name", help="Name of the account", type=str)
-parser.add_argument("-u", "--username", help="Username used in the account", type=str)
-parser.add_argument("-p", "--password", help="Password for the account", type=str)
-args = parser.parse_args()
 
-# Get account information from the command line arguments
-acc_name_input = args.name
-acc_username_input = args.username
-acc_pass_input = args.password
 
-# Initiate a UserAccount class with arguments
-user = UserAccount(acc_name_input, acc_username_input, acc_pass_input, iv=IV)
+def create_parser() -> argparse.ArgumentParser:
+    """Create and configure argument parser."""
+    parser = argparse.ArgumentParser(
+        prog="pyPass Password Manager",
+        description="Password manager that stores your encrypted data in a SQLite local file",
+    )
+    parser.add_argument(
+        "-f", "--function",
+        help="Function to perform: add, view, search or delete",
+        required=True,
+        type=str,
+        choices=["add", "view", "search", "delete"],
+    )
+    parser.add_argument(
+        "-n", "--name",
+        help="Name of the account",
+        type=str
+    )
+    parser.add_argument(
+        "-u", "--username",
+        help="Username used in the account",
+        type=str
+    )
+    parser.add_argument(
+        "-p", "--password",
+        help="Password for the account",
+        type=str
+    )
+    return parser
+
+
+def handle_view(args) -> None:
+    """Handle view function.
+    """
+    require_auth()
+    
+    if not args.name:
+        print("[!] Name required for view operation")
+        sys.exit(1)
+    
+    view_entry(args.name)
+
+
+def handle_add(args) -> None:
+    """Handle add function.
+    """
+    require_auth()
+    
+    if not all([args.name, args.username, args.password]):
+        print("[!] Name, username, and password required for add operation")
+        sys.exit(1)
+    
+    user = UserAccount(
+        name=args.name,
+        email=args.username,
+        password=args.password
+    )
+    encrypted_user = encrypt(user)
+    insert_into_db(encrypted_user)
+    print(f"[✓] Entry added for {args.name}")
+
+
+def handle_search(args) -> None:
+    """Handle search function.
+    """
+    require_auth()
+    
+    if not args.username:
+        print("[!] Username/email required for search operation")
+        sys.exit(1)
+    
+    search_by_email(args.username)
+
+
+def handle_delete(args) -> None:
+    """Handle delete function.
+    """
+    require_auth()
+    
+    if not all([args.name, args.username, args.password]):
+        print("[!] Name, username, and password required for delete operation")
+        sys.exit(1)
+    
+    success = delete_entry(args.username, args.password, args.name)
+    if success:
+        print(f"[✓] Entry deleted successfully")
+    else:
+        print(f"[✗] Failed to delete entry")
+
+
+def main() -> None:
+
+    parser = create_parser()
+    args = parser.parse_args()
+    
+    # Route to appropriate handler
+    handlers = {
+        "view": handle_view,
+        "add": handle_add,
+        "search": handle_search,
+        "delete": handle_delete,
+    }
+    
+    handler = handlers.get(args.function)
+    if handler:
+        handler(args)
+    else:
+        print(f"[!] Unknown function: {args.function}")
+        sys.exit(1)
+
 
 if __name__ == "__main__":
-    # Application logic for --function argument
-    if args.function == "view":
-        try:
-            user_check = input("Please enter master password: ")
-            if user_check != os.getenv("MASTER_PASS"):
-                print("[!] Wrong password try again")
-                sys.exit(1)
-            else:
-                user = view_entry(acc_name_input)
-        except Exception as e:
-            print(f"{e}")
-    elif args.function == "add":
-        user_check = input("Please enter master password: ")
-        try:
-            if user_check != os.getenv("MASTER_PASS"):
-                print("[!] Wrong password try again")
-                sys.exit(1)
-            else:
-                encrypted_user = encrypt(user)
-                insert_into_db(encrypted_user)
-        except Exception as e:
-            print(e)
-    elif args.function == "search" and acc_username_input != "" and acc_username_input is not None:
-        user_check = input("Please enter master password: ")
-        try:
-            if user_check != os.getenv("MASTER_PASS"):
-                print("[!] Wrong password try again")
-                sys.exit(1)
-            else:
-                search_by_email(args.username)
-        except Exception as e:
-            print(e)
-    elif args.function == "delete" and acc_username_input and acc_pass_input:
-        user_check = input("Please enter master password: ")
-        try:
-            if user_check != os.getenv("MASTER_PASS"):
-                print("[!] Wrong password try again")
-                sys.exit(1)
-            else:
-                delete_entry(acc_username_input, acc_pass_input, acc_name_input)
-        except Exception as e:
-            print(e)
+    main()
